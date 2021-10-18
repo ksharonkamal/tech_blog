@@ -55,14 +55,13 @@ class ForgotPassword(Resource):
     def post(self):
         data = request.get_json()
         email = data.get("email")
-        mobile = data.get("mobile")
 
-        if not (email and mobile):
-            app.logger.info("email, mobile fields are required")
-            return jsonify(status=400,message="email, mobile fields are required")
+        if not email:
+            app.logger.info("email field is required")
+            return jsonify(status=400,message="email field is required")
         else:
             try:
-                user = db.session.query(User).filter(and_(User.email == email, User.mobile == mobile)).first()
+                user = db.session.query(User).filter(User.email == email).first()
                 if user:
                     new_password = send_mail_to_reset_password(user.email, user.name)
                     if new_password == 'Error':
