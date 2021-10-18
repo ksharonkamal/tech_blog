@@ -18,12 +18,14 @@ api = Api(app)
 from app.models_and_views.views import GetQueryByTechnology, GetQueryByUserId, Login, QueriesClass,\
 Register,Logout,UpdatePassword,ForgotPassword,AddTechnologies,\
 CommentClass,Queries_class,UserProfile, UserStatus,\
-GetProfile,GetCommentByQueryId,GetCommentsByUserId,GetQueryByTechnology,Likes, DisLikes, Dashboard
+GetProfile,GetCommentByQueryId,GetCommentsByUserId,GetQueryByTechnology,Likes, DisLikes, FilterRecord
 
 
 from app.admin_module.users.views import GetAllUsers, UserStatus, UserDelete
 from app.admin_module.queries.views import GetQueryByUserId, QueriesClass
 from app.admin_module.comments.views import GetCommentsByUserId, CommentClass
+from app.admin_module.dashboard.views import Dashboard
+from app.admin_module.technologies.views import Technologies
 
 
 api.add_resource(Login, "/login")
@@ -47,7 +49,7 @@ api.add_resource(Likes,"/like")
 api.add_resource(DisLikes,"/dislike")
 
 
-api.add_resource(Dashboard,"/admin/toptenusers")
+api.add_resource(Dashboard,"/admin/toptenusers/<int:users_limit>")
 api.add_resource(GetAllUsers,"/admin/getallusers")
 api.add_resource(UserStatus, "/admin/userstatus")
 api.add_resource(UserDelete, "/admin/userdelete")
@@ -58,3 +60,6 @@ api.add_resource(QueriesClass, "/admin/query")
 api.add_resource(GetCommentsByUserId, "/admin/getcomments/user/<int:user_id>")
 api.add_resource(CommentClass, "/admin/comment")
 
+api.add_resource(Technologies, "/admin/technologies")
+
+api.add_resource(FilterRecord, "/admin/filterrecords")

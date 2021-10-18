@@ -6,6 +6,8 @@ from app import app,db
 from app.models_and_views.models import User,LikesDislikes
 from datetime import datetime
 from sqlalchemy import and_
+from utils.update_like_dislike_count import update_like_dislike_count
+
 
 class Likes(Resource):
     def post(self):
@@ -50,8 +52,10 @@ class Likes(Resource):
         like_dislike_record = LikesDislikes(user_id, comment_id, like, dislike, date_time_obj, date_time_obj)
         db.session.add(like_dislike_record)
         db.session.commit()
+        update_like_dislike_count(self)
         app.logger.info("Liked")
         return jsonify(status=200, message="Liked")
+
 
 class DisLikes(Resource):
     def post(self):
@@ -98,45 +102,6 @@ class DisLikes(Resource):
         like_dislike_record = LikesDislikes(user_id, comment_id, like, dislike, date_time_obj, date_time_obj)
         db.session.add(like_dislike_record)
         db.session.commit()
+        update_like_dislike_count(self)
         app.logger.info("DisLiked")
         return jsonify(status=200, message="DisLiked")
-
-
-
-# class DisLikes(Resource):
-#     def post(self):
-#         data=request.get_json() or {}
-#         user_id=data.get('user_id')
-#         comment_id=data.get('comment_id')
-#         if not (user_id and comment_id):
-#              app.logger.info("query_id,user_id and comment_id are required")
-#              return jsonify(status=400,message="query_id,user_id and comment_id are required")
-#         user_obj=db.session.query(User).filter_by(id=user_id).first()
-#         comment_obj=db.session.query(Comments).filter_by(id=comment_id).first()
-#         if not user_obj:
-#             app.logger.info("user not found")
-#             return jsonify(status=400, message="user not found")
-#         if not comment_obj:
-#             app.logger.info("comment not found")
-#             return jsonify(status=400, message="comment not found")
-#         likes_dislikes_obj = LikesDislikes.query.filter(and_(LikesDislikes.u_id == user_id,
-#                                                              LikesDislikes.c_id == comment_id)).first()
-#         if likes_dislikes_obj:
-#             if likes_dislikes_obj.like_status or likes_dislikes_obj.dislike_status:
-#                 app.logger.info("already liked or disliked")
-#                 return jsonify(status=404, message="already liked or disliked")
-#         today = datetime.now()
-#         date_time_obj = today.strftime('%Y/%m/%d %H:%M:%S')
-#         like=False
-#         dislike=True
-#         like_dislike_record=LikesDislikes(user_id,comment_id,like,dislike,date_time_obj,date_time_obj)
-#         db.session.add(like_dislike_record)
-#         db.session.commit()
-#         app.logger.info("Disliked")
-#         return jsonify(status=200, message="Disliked")
-#
-
-
-
-
-

@@ -7,7 +7,7 @@ from sqlalchemy.orm import query
 from sqlalchemy.sql.expression import delete
 from sqlalchemy.sql.functions import user
 from werkzeug.security import generate_password_hash, check_password_hash
-from .models import User, Technologies, Queries, Comments, LikesDislikes
+from app.models_and_views.models import User, Technologies, Queries, Comments, LikesDislikes
 from app import app, db
 from sqlalchemy import or_,and_,desc
 import re,ast
@@ -339,8 +339,7 @@ class QueriesClass(Resource):
             return jsonify(status=404,message="User not allowed to edit")
         app.logger.info("Query didn't found")
         return jsonify(status=404,message="Query didn't found")
-            
-    
+
     @authentication
     def delete(self):
         data=request.get_json() or {}
@@ -913,7 +912,7 @@ class Dashboard(Resource):
 
 
 class FilterRecord(Resource):
-    @authentication
+    # @authentication
     def post(self):
         data = request.get_json() or {}
         if not data:
@@ -926,14 +925,14 @@ class FilterRecord(Resource):
         technologies=data.get('technologies')
         if not (from_date and to_date): #and (users or queries or technologies)
             app.logger.info("from_date , to_date are required fields") #and user or queries or technologies
-            return jsonify(status=400,message="from_date , to_date and user or queries or technologies are required fields")
+            return jsonify(status=400,message="from_date ,to_date and user or queries or technologies are required fields")
         if users:
-            table_name=User
+            table_name = User
         elif queries:
-            table_name=Queries
+            table_name = Queries
         elif technologies:
-            table_name=Technologies
-        get_records_from_to=table_name.query.filter(and_(table_name.updated_at >= from_date,
+            table_name = Technologies
+        get_records_from_to = table_name.query.filter(and_(table_name.updated_at >= from_date,
                                                          table_name.updated_at <= to_date)).count()
 
         if not get_records_from_to:

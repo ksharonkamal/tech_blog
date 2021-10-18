@@ -20,8 +20,7 @@ from utils.update_like_dislike_count import update_like_dislike_count
 
 
 class Dashboard(Resource):
-
-    def get(self):
+    def get(self, users_limit):
         update_like_dislike_count(self)
         top_ten_list = []
         top_ten_users_list = []
@@ -29,14 +28,15 @@ class Dashboard(Resource):
 
         comment_obj_list = Comments.query.filter(Comments.like_count>=Comments.dislike_count).\
             order_by(Comments.like_count.desc()).all()
+        print(comment_obj_list)
 
         if not comment_obj_list:
             app.logger.info("No comments in db")
             return jsonify(status=400, message="No comments in db")
 
         for itr in comment_obj_list:
-            if itr.like_count and count<10:
-                # print("cmt_id=", itr.id, "Like count = ", itr.like_count, "dislike count =", itr.dislike_count)
+            if itr.like_count and count<users_limit:
+                print("cmt_id=", itr.id, "Like count = ", itr.like_count, "dislike count =", itr.dislike_count)
                 user_obj = User.query.filter_by(id=itr.u_id).first()
                 if not user_obj:
                     app.logger.info("No user in db")
@@ -44,10 +44,17 @@ class Dashboard(Resource):
                 top_ten_users_list.append(user_obj)
                 count=count+1
 
+        if not top_ten_users_list:
+            app.logger.info("No top users")
+            return jsonify(status=400, message="No top users")
+
         for itr in top_ten_users_list:
             dt = user_serializer(itr)
             top_ten_list.append(dt)
         app.logger.info("Return top 10 user data")
-        return jsonify(status=200, data=get_paginated_list(top_ten_list, "/toptenusers", start=request.args.get('start', 1),
-                                          limit=request.args.get('limit', 3)), message="Returning top 10 use data")
 
+        page = "/admin/toptenusers/" + f'{users_limit}'
+
+        return jsonify(status=200, data=get_paginated_list(top_ten_list,page, start=request.args.get('start', 1),
+                                          limit=request.args.get('limit', 3)), message="Returning top 10 use data")
+        # return jsonify(status=200, data=top_ten_list, message="Returning top 10 use data")

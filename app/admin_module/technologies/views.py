@@ -7,7 +7,7 @@ from sqlalchemy.orm import query
 from sqlalchemy.sql.expression import delete
 from sqlalchemy.sql.functions import user
 from werkzeug.security import generate_password_hash, check_password_hash
-from app.models_and_views.models import User, Technologies, Queries, Comments, Opinion
+from app.models_and_views.models import User, Technologies, Queries, Comments, LikesDislikes
 from app import app, db
 from sqlalchemy import or_,and_,desc
 import re,ast
@@ -50,6 +50,41 @@ class Technologies(Resource):
         return jsonify(status=200, message="added successfully")
 
     @authentication
+    def put(self):
+        data = request.get_json() or {}
+        if not data:
+            app.logger.info("No input(s)")
+            return jsonify(status=400, message="No input(s)")
+        user_id = data.get('user_id')
+        tech_id = data.get('technology_id')
+        technology_name = data.get('technology_name')
+        if not (user_id and tech_id and technology_name):
+            app.logger.info("User_id, technology_id and technology name are required")
+            return jsonify(status=404, message="User_id, technology_id and technology name are required")
+        check_user = User.query.filter_by(id=user_id).first()
+        check_tech = Technologies.query.filter_by(id=tech_id).first()
+
+        if not check_user or tech_id:
+            app.logger.info("User or tech_id not found")
+            return jsonify(status=400, message="User or tech_id not found")
+
+        if not (check_user.roles == 2 or check_user.roles == 3):
+            app.logger.info("User not allowed to add technologies")
+            return jsonify(status=404, message="User not allowed to add technologies")
+
+        if check_tech and check_tech.status == 0:
+            app.logger.info(f"{check_tech.name} technology does not exists")
+            return jsonify(status=400, message=f"{check_tech.name} technology does not exists")
+
+        today = datetime.now()
+        date_time_obj = today.strftime('%Y/%m/%d %H:%M:%S')
+
+        check_tech.name = technology_name
+        check_tech.updated_at = date_time_obj
+        db.session.commit()
+        return jsonify(status=200, message="added successfully")
+
+    @authentication
     def delete(self):
         data = request.get_json() or {}
         if not data:
@@ -67,8 +102,8 @@ class Technologies(Resource):
             app.logger.info("User not found")
             return jsonify(status=400, message="User not found")
         if tech_check:
-            if (user_check.roles != 1):
-                db.session.delete(tech_check)
+            if user_check.roles != 1:
+                tech_check.status = 0
                 db.session.commit()
                 app.logger.info("Query deleted successfully")
                 return jsonify(status=200, message="Query deleted successfully")

@@ -46,7 +46,7 @@ def user_serializer(user):
         tech_check = Technologies.query.filter_by(id=int(itr)).first()
         if tech_check:
             tech_list.append(tech_check.name)
-    print(tech_list)
+    # print(tech_list)
 
     dt = {
         'name': user.name,
@@ -58,7 +58,6 @@ def user_serializer(user):
         'updated_at':user.updated_at
     }
     return dt
-
 
 
 def query_serializer(query_obj):
@@ -86,7 +85,7 @@ def comments_serializer(comments_obj):
         'like_count':comments_obj.like_count,
         'dislike_count':comments_obj.dislike_count,
         'updated_at':comments_obj.updated_at
-        #'status':comments_obj.status
+        # 'status':comments_obj.status
     }
     return dt
 

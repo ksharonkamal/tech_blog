@@ -104,7 +104,7 @@ class UserStatus(Resource):
             app.logger.info("User you wanted to change role not found")
             return jsonify(status=400, message="User you wanted to change role not found")
 
-        if user_check.roles == 2:
+        if user_check.roles == 3:
             change_user_role_check.roles = change_user_role
             today = datetime.now()
             date_time_obj = today.strftime('%Y/%m/%d %H:%M:%S')
@@ -137,7 +137,7 @@ class UserDelete(Resource):
             app.logger.info("User wanted to delete not found")
             return jsonify(status=400, message="User wanted to delete not found")
 
-        if user_check.roles == 2 or user_check.roles == 3:
+        if user_check.roles == 3:
             delete_user.status = 0  # changed from roles to status (soft delete)
             today = datetime.now()
             date_time_obj = today.strftime('%Y/%m/%d %H:%M:%S')

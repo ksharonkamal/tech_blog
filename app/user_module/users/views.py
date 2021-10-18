@@ -7,7 +7,7 @@ from sqlalchemy.orm import query
 from sqlalchemy.sql.expression import delete
 from sqlalchemy.sql.functions import user
 from werkzeug.security import generate_password_hash, check_password_hash
-from app.models_and_views.models import User, Technologies, Queries, Comments, Opinion
+from app.models_and_views.models import User, Technologies, Queries, Comments, LikesDislikes
 from app import app, db
 from sqlalchemy import or_,and_,desc
 import re,ast
